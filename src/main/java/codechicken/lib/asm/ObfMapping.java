@@ -136,6 +136,14 @@ public class ObfMapping {
                     final String gradleCsvDir = System.getProperty("net.minecraftforge.gradle.GradleStart.csvDir");
                     return gradleCsvDir != null ? new File(gradleCsvDir) : null;
                 default:
+                    System.err.println("Could not find dev obfuscation mappings, asking user for manual input");
+                    System.err.println("Did not find it at: net.minecraftforge.gradle.GradleStart.csvDir = "
+                            + System.getProperty("net.minecraftforge.gradle.GradleStart.csvDir", "null"));
+
+                    if (java.awt.GraphicsEnvironment.isHeadless()) {
+                        // We can't show a JFileChooser if there is no graphical display
+                        return null;
+                    }
                     JFileChooser fc = new JFileChooser(mcDir);
                     fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
                     fc.setDialogTitle("Select an mcp conf dir for the deobfuscator.");
