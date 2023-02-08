@@ -43,7 +43,8 @@ public abstract class WorldExtension {
     }
 
     protected final void saveChunkData(Chunk chunk, NBTTagCompound tag) {
-        chunkMap.get(chunk).saveData(tag);
+        final ChunkExtension extension = chunkMap.get(chunk);
+        if (extension != null) extension.saveData(tag);
     }
 
     protected final void remChunk(Chunk chunk) {
