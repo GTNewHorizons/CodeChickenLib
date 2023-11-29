@@ -2,7 +2,11 @@ package codechicken.lib.render;
 
 import static codechicken.lib.math.MathHelper.phi;
 
-import codechicken.lib.vec.*;
+import codechicken.lib.vec.Matrix4;
+import codechicken.lib.vec.Quat;
+import codechicken.lib.vec.Rotation;
+import codechicken.lib.vec.Scale;
+import codechicken.lib.vec.Vector3;
 
 public class CCModelLibrary {
 

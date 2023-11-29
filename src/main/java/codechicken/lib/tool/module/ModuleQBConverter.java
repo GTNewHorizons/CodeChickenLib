@@ -4,9 +4,9 @@ import static java.util.Arrays.asList;
 
 import java.io.File;
 
+import codechicken.lib.render.QBImporter;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
-import codechicken.lib.render.QBImporter;
 
 public class ModuleQBConverter extends JOptModule {
 

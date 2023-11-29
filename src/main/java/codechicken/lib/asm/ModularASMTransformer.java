@@ -1,11 +1,21 @@
 package codechicken.lib.asm;
 
-import static codechicken.lib.asm.ASMHelper.*;
+import static codechicken.lib.asm.ASMHelper.config;
+import static codechicken.lib.asm.ASMHelper.createBytes;
+import static codechicken.lib.asm.ASMHelper.dump;
+import static codechicken.lib.asm.ASMHelper.findMethod;
+import static codechicken.lib.asm.ASMHelper.logger;
 
 import java.io.File;
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 
-import org.objectweb.asm.*;
+import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.ClassVisitor;
+import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.InsnList;
 import org.objectweb.asm.tree.MethodNode;

@@ -2,10 +2,10 @@ package codechicken.lib.tool.module;
 
 import java.io.IOException;
 
+import codechicken.lib.tool.ToolMain;
 import joptsimple.OptionException;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
-import codechicken.lib.tool.ToolMain;
 
 public abstract class JOptModule implements ToolMain.Module {
 

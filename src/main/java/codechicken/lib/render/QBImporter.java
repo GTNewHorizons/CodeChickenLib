@@ -1,8 +1,19 @@
 package codechicken.lib.render;
 
 import java.awt.image.BufferedImage;
-import java.io.*;
-import java.util.*;
+import java.io.DataInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 import javax.imageio.ImageIO;
 
@@ -11,12 +22,20 @@ import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.ResourceLocation;
 
-import codechicken.lib.render.uv.UV;
-import codechicken.lib.render.uv.UVScale;
-import codechicken.lib.vec.*;
-
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
+
+import codechicken.lib.render.uv.UV;
+import codechicken.lib.render.uv.UVScale;
+import codechicken.lib.vec.BlockCoord;
+import codechicken.lib.vec.Cuboid6;
+import codechicken.lib.vec.CuboidCoord;
+import codechicken.lib.vec.Rectangle4i;
+import codechicken.lib.vec.Rotation;
+import codechicken.lib.vec.Scale;
+import codechicken.lib.vec.Transformation;
+import codechicken.lib.vec.Translation;
+import codechicken.lib.vec.Vector3;
 
 public class QBImporter {
 

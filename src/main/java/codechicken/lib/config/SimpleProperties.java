@@ -1,6 +1,10 @@
 package codechicken.lib.config;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
+import java.io.PrintStream;
 import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map.Entry;

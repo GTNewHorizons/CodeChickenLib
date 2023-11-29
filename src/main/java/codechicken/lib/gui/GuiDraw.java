@@ -1,6 +1,7 @@
 package codechicken.lib.gui;
 
-import java.awt.*;
+import java.awt.Dimension;
+import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;

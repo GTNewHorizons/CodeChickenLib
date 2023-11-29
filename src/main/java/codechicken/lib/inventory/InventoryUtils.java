@@ -15,9 +15,9 @@ import net.minecraft.tileentity.TileEntityChest;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 
-import codechicken.lib.vec.Vector3;
-
 import com.google.common.base.Objects;
+
+import codechicken.lib.vec.Vector3;
 
 public class InventoryUtils {
 

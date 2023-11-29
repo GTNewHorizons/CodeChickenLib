@@ -11,9 +11,9 @@ import net.minecraftforge.fluids.FluidStack;
 
 import org.apache.commons.lang3.Validate;
 
-import codechicken.lib.vec.BlockCoord;
-
 import com.google.common.base.Charsets;
+
+import codechicken.lib.vec.BlockCoord;
 import cpw.mods.fml.common.network.ByteBufUtils;
 
 public class MCDataOutputWrapper implements MCDataOutput {

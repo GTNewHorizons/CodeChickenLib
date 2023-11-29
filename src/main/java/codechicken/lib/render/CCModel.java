@@ -2,8 +2,18 @@ package codechicken.lib.render;
 
 import static codechicken.lib.vec.Rotation.sideRotations;
 
-import java.io.*;
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -16,7 +26,11 @@ import codechicken.lib.render.uv.UV;
 import codechicken.lib.render.uv.UVTransformation;
 import codechicken.lib.render.uv.UVTranslation;
 import codechicken.lib.util.Copyable;
-import codechicken.lib.vec.*;
+import codechicken.lib.vec.Cuboid6;
+import codechicken.lib.vec.RedundantTransformation;
+import codechicken.lib.vec.Transformation;
+import codechicken.lib.vec.TransformationList;
+import codechicken.lib.vec.Vector3;
 
 public class CCModel implements CCRenderState.IVertexSource, Copyable<CCModel> {
 
