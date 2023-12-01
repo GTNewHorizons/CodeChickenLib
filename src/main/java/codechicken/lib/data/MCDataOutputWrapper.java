@@ -201,9 +201,9 @@ public class MCDataOutputWrapper implements MCDataOutput {
 
     public MCDataOutputWrapper writeItemStack(ItemStack stack, boolean large) {
         if (stack == null) {
-            writeShort(-1);
+            writeInt(-1);
         } else {
-            writeShort(Item.getIdFromItem(stack.getItem()));
+            writeInt(Item.getIdFromItem(stack.getItem()));
             if (large) writeInt(stack.stackSize);
             else writeByte(stack.stackSize);
             writeShort(stack.getItemDamage());
