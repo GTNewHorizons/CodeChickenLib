@@ -38,15 +38,15 @@ public abstract class Transformation extends ITransformation<Vector3, Transforma
     public abstract void glApply();
 
     @Override
-    public boolean load() {
-        CCRenderState.pipeline.addRequirement(CCRenderState.normalAttrib.operationID());
+    public boolean load(CCRenderState state) {
+        state.pipelineLocal.addRequirement(CCRenderState.normalAttrib.operationID());
         return !isRedundant();
     }
 
     @Override
-    public void operate() {
-        apply(CCRenderState.vert.vec);
-        if (CCRenderState.normalAttrib.active) applyN(CCRenderState.normal);
+    public void operate(CCRenderState state) {
+        apply(state.vert.vec);
+        if (CCRenderState.normalAttrib.active) applyN(state.normal);
     }
 
     @Override

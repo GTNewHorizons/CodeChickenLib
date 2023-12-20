@@ -62,16 +62,16 @@ public class Canvas9Seg {
         t.addVertexWithUV(sw[u + 1], sh[v], 0, seg_u[u + 1], seg_v[v]);
     }
 
-    public void draw(int x, int y, int w, int h) {
+    public void draw(CCRenderState state, int x, int y, int w, int h) {
         CCRenderState.changeTexture(tex);
-        CCRenderState.reset();
-        CCRenderState.startDrawing();
+        state.reset();
+        state.startDrawing();
 
         int[] sw = new int[] { x, x + seg_w[0], x + w - seg_w[2], x + w };
         int[] sh = new int[] { y, y + seg_h[0], y + h - seg_h[2], y + h };
 
         for (int seg = 0; seg < 9; seg++) drawSeg(sw, sh, seg);
 
-        CCRenderState.draw();
+        state.draw();
     }
 }

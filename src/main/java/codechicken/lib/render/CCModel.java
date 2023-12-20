@@ -32,6 +32,7 @@ import codechicken.lib.vec.Transformation;
 import codechicken.lib.vec.TransformationList;
 import codechicken.lib.vec.Vector3;
 
+@SuppressWarnings("ForLoopReplaceableByForEach")
 public class CCModel implements CCRenderState.IVertexSource, Copyable<CCModel> {
 
     private static class PositionNormalEntry {
@@ -88,7 +89,7 @@ public class CCModel implements CCRenderState.IVertexSource, Copyable<CCModel> {
     }
 
     @Override
-    public void prepareVertex() {}
+    public void prepareVertex(CCRenderState state) {}
 
     public <T> T getOrAllocate(CCRenderState.VertexAttribute<T> attrib) {
         T array = getAttributes(attrib);
@@ -426,20 +427,20 @@ public class CCModel implements CCRenderState.IVertexSource, Copyable<CCModel> {
         return this;
     }
 
-    public void render(double x, double y, double z, double u, double v) {
-        render(new Vector3(x, y, z).translation(), new UVTranslation(u, v));
+    public void render(CCRenderState state, double x, double y, double z, double u, double v) {
+        render(state, new Vector3(x, y, z).translation(), new UVTranslation(u, v));
     }
 
-    public void render(double x, double y, double z, UVTransformation u) {
-        render(new Vector3(x, y, z).translation(), u);
+    public void render(CCRenderState state, double x, double y, double z, UVTransformation u) {
+        render(state, new Vector3(x, y, z).translation(), u);
     }
 
-    public void render(Transformation t, double u, double v) {
-        render(t, new UVTranslation(u, v));
+    public void render(CCRenderState state, Transformation t, double u, double v) {
+        render(state, t, new UVTranslation(u, v));
     }
 
-    public void render(CCRenderState.IVertexOperation... ops) {
-        render(0, verts.length, ops);
+    public void render(CCRenderState state, CCRenderState.IVertexOperation... ops) {
+        render(state, 0, verts.length, ops);
     }
 
     /**
@@ -449,9 +450,9 @@ public class CCModel implements CCRenderState.IVertexSource, Copyable<CCModel> {
      * @param end   The vertex index to render until
      * @param ops   Operations to apply
      */
-    public void render(int start, int end, CCRenderState.IVertexOperation... ops) {
-        CCRenderState.setPipeline(this, start, end, ops);
-        CCRenderState.render();
+    public void render(CCRenderState state, int start, int end, CCRenderState.IVertexOperation... ops) {
+        state.setPipeline(this, start, end, ops);
+        state.render();
     }
 
     public static CCModel quadModel(int numVerts) {

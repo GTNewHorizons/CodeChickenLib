@@ -146,20 +146,10 @@ public class BlockCoord implements Comparable<BlockCoord>, Copyable<BlockCoord> 
 
     public BlockCoord setSide(int s, int v) {
         switch (s) {
-            case 0:
-            case 1:
-                y = v;
-                break;
-            case 2:
-            case 3:
-                z = v;
-                break;
-            case 4:
-            case 5:
-                x = v;
-                break;
-            default:
-                throw new IndexOutOfBoundsException("Switch Falloff");
+            case 0, 1 -> y = v;
+            case 2, 3 -> z = v;
+            case 4, 5 -> x = v;
+            default -> throw new IndexOutOfBoundsException("Switch Falloff");
         }
         return this;
     }

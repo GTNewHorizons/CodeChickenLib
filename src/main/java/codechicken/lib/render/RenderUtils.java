@@ -151,7 +151,7 @@ public class RenderUtils {
         var2.draw();
     }
 
-    public static void renderFluidCuboid(Cuboid6 bound, IIcon tex, double res) {
+    public static void renderFluidCuboid(CCRenderState state, Cuboid6 bound, IIcon tex, double res) {
         renderFluidQuad( // bottom
                 new Vector3(bound.min.x, bound.min.y, bound.min.z),
                 new Vector3(bound.max.x, bound.min.y, bound.min.z),
@@ -249,13 +249,13 @@ public class RenderUtils {
      * @param stack The fluid stack to render
      * @return The icon of the fluid
      */
-    public static IIcon prepareFluidRender(FluidStack stack, int alpha) {
+    public static IIcon prepareFluidRender(CCRenderState state, FluidStack stack, int alpha) {
         GL11.glDisable(GL11.GL_LIGHTING);
         GL11.glEnable(GL11.GL_BLEND);
         GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 
         Fluid fluid = stack.getFluid();
-        CCRenderState.setColour(fluid.getColor(stack) << 8 | alpha);
+        state.setColour(fluid.getColor(stack) << 8 | alpha);
         TextureUtils.bindAtlas(fluid.getSpriteNumber());
         return TextureUtils.safeIcon(fluid.getIcon(stack));
     }
@@ -283,21 +283,23 @@ public class RenderUtils {
      *                this determines the height.
      * @param res     The resolution to render at.
      */
-    public static void renderFluidCuboid(FluidStack stack, Cuboid6 bound, double density, double res) {
+    public static void renderFluidCuboid(CCRenderState state, FluidStack stack, Cuboid6 bound, double density,
+            double res) {
         if (!shouldRenderFluid(stack)) return;
 
         int alpha = 255;
         if (stack.getFluid().isGaseous()) alpha = (int) (fluidDensityToAlpha(density) * 255);
         else bound.max.y = bound.min.y + (bound.max.y - bound.min.y) * density;
 
-        IIcon tex = prepareFluidRender(stack, alpha);
-        CCRenderState.startDrawing();
-        renderFluidCuboid(bound, tex, res);
-        CCRenderState.draw();
+        IIcon tex = prepareFluidRender(state, stack, alpha);
+        state.startDrawing();
+        renderFluidCuboid(state, bound, tex, res);
+        state.draw();
         postFluidRender();
     }
 
-    public static void renderFluidGauge(FluidStack stack, Rectangle4i rect, double density, double res) {
+    public static void renderFluidGauge(CCRenderState state, FluidStack stack, Rectangle4i rect, double density,
+            double res) {
         if (!shouldRenderFluid(stack)) return;
 
         int alpha = 255;
@@ -308,15 +310,15 @@ public class RenderUtils {
             rect.h = height;
         }
 
-        IIcon tex = prepareFluidRender(stack, alpha);
-        CCRenderState.startDrawing();
+        IIcon tex = prepareFluidRender(state, stack, alpha);
+        state.startDrawing();
         renderFluidQuad(
                 new Vector3(rect.x, rect.y + rect.h, 0),
                 new Vector3(rect.w, 0, 0),
                 new Vector3(0, -rect.h, 0),
                 tex,
                 res);
-        CCRenderState.draw();
+        state.draw();
         postFluidRender();
     }
 

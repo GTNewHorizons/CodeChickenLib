@@ -23,13 +23,13 @@ public abstract class UVTransformation extends ITransformation<UV, UVTransformat
     }
 
     @Override
-    public boolean load() {
+    public boolean load(CCRenderState state) {
         return !isRedundant();
     }
 
     @Override
-    public void operate() {
-        apply(CCRenderState.vert.uv);
+    public void operate(CCRenderState state) {
+        apply(state.vert.uv);
     }
 
     @Override

@@ -29,8 +29,8 @@ public class BlockRenderer {
         }
 
         @Override
-        public void prepareVertex() {
-            CCRenderState.side = side;
+        public void prepareVertex(CCRenderState state) {
+            state.side = side;
         }
 
         public BlockFace computeLightCoords() {
@@ -145,16 +145,17 @@ public class BlockRenderer {
         }
 
         @Override
-        public void prepareVertex() {
-            CCRenderState.side = CCRenderState.vertexIndex >> 2;
+        public void prepareVertex(CCRenderState state) {
+            state.side = state.vertexIndex >> 2;
         }
     }
 
     public static FullBlock fullBlock = new FullBlock();
 
-    public static void renderFullBlock(int sideMask) {
-        CCRenderState.setModel(fullBlock);
-        renderFaces(sideMask);
+    // public static void renderFullBlock(int sideMask) {
+    public static void renderFullBlock(CCRenderState state, int sideMask) {
+        state.setModel(fullBlock);
+        renderFaces(state, sideMask);
     }
 
     /**
@@ -162,15 +163,16 @@ public class BlockRenderer {
      * 
      * @param sideMask A mask of faces not to render
      */
-    public static void renderFaces(int sideMask) {
+    // public static void renderFaces(int sideMask) {
+    public static void renderFaces(CCRenderState state, int sideMask) {
         if (sideMask == 0x3F) return;
         for (int s = 0; s < 6; s++) if ((sideMask & 1 << s) == 0) {
-            CCRenderState.setVertexRange(s * 4, (s + 1) * 4);
-            CCRenderState.render();
+            state.setVertexRange(s * 4, (s + 1) * 4);
+            state.render();
         }
     }
 
-    private static BlockFace face = new BlockFace();
+    private static final BlockFace face = new BlockFace();
 
     /**
      * Renders faces of a cuboid with texture coordinates mapped to match a standard minecraft block
@@ -178,13 +180,13 @@ public class BlockRenderer {
      * @param bounds   The bounding cuboid to render
      * @param sideMask A mask of faces not to render
      */
-    public static void renderCuboid(Cuboid6 bounds, int sideMask) {
+    public static void renderCuboid(CCRenderState state, Cuboid6 bounds, int sideMask) {
         if (sideMask == 0x3F) return;
 
-        CCRenderState.setModel(face);
+        state.setModel(face);
         for (int s = 0; s < 6; s++) if ((sideMask & 1 << s) == 0) {
             face.loadCuboidFace(bounds, s);
-            CCRenderState.render();
+            state.render();
         }
     }
 }

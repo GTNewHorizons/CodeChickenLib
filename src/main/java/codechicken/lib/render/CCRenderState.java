@@ -21,6 +21,20 @@ import codechicken.lib.vec.Vector3;
  * static variables.
  */
 public class CCRenderState {
+    // TODO: Do a similar ASM to the tesselator redirector in Angelica
+    // public static CCRenderPipeline pipeline = new CCRenderPipeline(instance());
+
+    public final CCRenderPipeline pipelineLocal;
+
+    private static final ThreadLocal<CCRenderState> instances = ThreadLocal.withInitial(CCRenderState::new);
+
+    private CCRenderState() {
+        pipelineLocal = new CCRenderPipeline(this);
+    }
+
+    public static CCRenderState instance() {
+        return instances.get();
+    }
 
     private static int nextOperationIndex;
 
@@ -35,25 +49,27 @@ public class CCRenderState {
     /**
      * Represents an operation to be run for each vertex that operates on and modifies the current state
      */
-    public static interface IVertexOperation {
+    public interface IVertexOperation {
 
         /**
          * Load any required references and add dependencies to the pipeline based on the current model (may be null)
          * Return false if this operation is redundant in the pipeline with the given model
          */
-        public boolean load();
+        // boolean load();
+        boolean load(CCRenderState state);
 
         /**
          * Perform the operation on the current render state
          */
-        public void operate();
+        // void operate();
+        void operate(CCRenderState state);
 
         /**
          * Get the unique id representing this type of operation. Duplicate operation IDs within the pipeline may have
          * unexpected results. ID shoulld be obtained from CCRenderState.registerOperation() and stored in a static
          * variable
          */
-        public int operationID();
+        int operationID();
     }
 
     private static ArrayList<VertexAttribute<?>> vertexAttributes = new ArrayList<VertexAttribute<?>>();
@@ -131,7 +147,8 @@ public class CCRenderState {
         /**
          * Callback to set CCRenderState for a vertex before the pipeline runs
          */
-        public void prepareVertex();
+        // public void prepareVertex();
+        public void prepareVertex(CCRenderState state);
     }
 
     public static VertexAttribute<Vector3[]> normalAttrib = new VertexAttribute<Vector3[]>() {
@@ -144,12 +161,12 @@ public class CCRenderState {
         }
 
         @Override
-        public boolean load() {
-            normalRef = model.getAttributes(this);
-            if (model.hasAttribute(this)) return normalRef != null;
+        public boolean load(CCRenderState state) {
+            normalRef = state.model.getAttributes(this);
+            if (state.model.hasAttribute(this)) return normalRef != null;
 
-            if (model.hasAttribute(sideAttrib)) {
-                pipeline.addDependency(sideAttrib);
+            if (state.model.hasAttribute(sideAttrib)) {
+                state.pipelineLocal.addDependency(sideAttrib);
                 return true;
             }
             throw new IllegalStateException(
@@ -157,9 +174,9 @@ public class CCRenderState {
         }
 
         @Override
-        public void operate() {
-            if (normalRef != null) setNormal(normalRef[vertexIndex]);
-            else setNormal(Rotation.axes[side]);
+        public void operate(CCRenderState state) {
+            if (normalRef != null) state.setNormal(normalRef[state.vertexIndex]);
+            else state.setNormal(Rotation.axes[state.side]);
         }
     };
     public static VertexAttribute<int[]> colourAttrib = new VertexAttribute<int[]>() {
@@ -172,15 +189,15 @@ public class CCRenderState {
         }
 
         @Override
-        public boolean load() {
-            colourRef = model.getAttributes(this);
-            return colourRef != null || !model.hasAttribute(this);
+        public boolean load(CCRenderState state) {
+            colourRef = state.model.getAttributes(this);
+            return colourRef != null || !state.model.hasAttribute(this);
         }
 
         @Override
-        public void operate() {
-            if (colourRef != null) setColour(ColourRGBA.multiply(baseColour, colourRef[vertexIndex]));
-            else setColour(baseColour);
+        public void operate(CCRenderState state) {
+            if (colourRef != null) state.setColour(ColourRGBA.multiply(state.baseColour, colourRef[state.vertexIndex]));
+            else state.setColour(state.baseColour);
         }
     };
     public static VertexAttribute<int[]> lightingAttrib = new VertexAttribute<int[]>() {
@@ -193,20 +210,20 @@ public class CCRenderState {
         }
 
         @Override
-        public boolean load() {
-            if (!computeLighting || !useColour || !model.hasAttribute(this)) return false;
+        public boolean load(CCRenderState state) {
+            if (!state.computeLighting || !state.useColour || !state.model.hasAttribute(this)) return false;
 
-            colourRef = model.getAttributes(this);
+            colourRef = state.model.getAttributes(this);
             if (colourRef != null) {
-                pipeline.addDependency(colourAttrib);
+                state.pipelineLocal.addDependency(colourAttrib);
                 return true;
             }
             return false;
         }
 
         @Override
-        public void operate() {
-            setColour(ColourRGBA.multiply(colour, colourRef[vertexIndex]));
+        public void operate(CCRenderState state) {
+            state.setColour(ColourRGBA.multiply(state.colour, colourRef[state.vertexIndex]));
         }
     };
     public static VertexAttribute<int[]> sideAttrib = new VertexAttribute<int[]>() {
@@ -219,18 +236,18 @@ public class CCRenderState {
         }
 
         @Override
-        public boolean load() {
-            sideRef = model.getAttributes(this);
-            if (model.hasAttribute(this)) return sideRef != null;
+        public boolean load(CCRenderState state) {
+            sideRef = state.model.getAttributes(this);
+            if (state.model.hasAttribute(this)) return sideRef != null;
 
-            pipeline.addDependency(normalAttrib);
+            state.pipelineLocal.addDependency(normalAttrib);
             return true;
         }
 
         @Override
-        public void operate() {
-            if (sideRef != null) side = sideRef[vertexIndex];
-            else side = CCModel.findSide(normal);
+        public void operate(CCRenderState state) {
+            if (sideRef != null) state.side = sideRef[state.vertexIndex];
+            else state.side = CCModel.findSide(state.normal);
         }
     };
     /**
@@ -239,8 +256,8 @@ public class CCRenderState {
     public static VertexAttribute<LC[]> lightCoordAttrib = new VertexAttribute<LC[]>() {
 
         private LC[] lcRef;
-        private Vector3 vec = new Vector3(); // for computation
-        private Vector3 pos = new Vector3();
+        private final Vector3 vec = new Vector3(); // for computation
+        private final Vector3 pos = new Vector3();
 
         @Override
         public LC[] newArray(int length) {
@@ -248,110 +265,109 @@ public class CCRenderState {
         }
 
         @Override
-        public boolean load() {
-            lcRef = model.getAttributes(this);
-            if (model.hasAttribute(this)) return lcRef != null;
+        public boolean load(CCRenderState state) {
+            lcRef = state.model.getAttributes(this);
+            if (state.model.hasAttribute(this)) return lcRef != null;
 
-            pos.set(lightMatrix.pos.x, lightMatrix.pos.y, lightMatrix.pos.z);
-            pipeline.addDependency(sideAttrib);
-            pipeline.addRequirement(Transformation.operationIndex);
+            pos.set(state.lightMatrix.pos.x, state.lightMatrix.pos.y, state.lightMatrix.pos.z);
+            state.pipelineLocal.addDependency(sideAttrib);
+            state.pipelineLocal.addRequirement(Transformation.operationIndex);
             return true;
         }
 
         @Override
-        public void operate() {
-            if (lcRef != null) lc.set(lcRef[vertexIndex]);
-            else lc.compute(vec.set(vert.vec).sub(pos), side);
+        public void operate(CCRenderState state) {
+            if (lcRef != null) state.lc.set(lcRef[state.vertexIndex]);
+            else state.lc.compute(vec.set(state.vert.vec).sub(pos), state.side);
         }
     };
 
     // pipeline state
-    public static IVertexSource model;
-    public static int firstVertexIndex;
-    public static int lastVertexIndex;
-    public static int vertexIndex;
-    public static CCRenderPipeline pipeline = new CCRenderPipeline();
+    public IVertexSource model;
+    public int firstVertexIndex;
+    public int lastVertexIndex;
+    public int vertexIndex;
 
     // context
-    public static int baseColour;
-    public static int alphaOverride;
-    public static boolean useNormals;
-    public static boolean computeLighting;
-    public static boolean useColour;
-    public static LightMatrix lightMatrix = new LightMatrix();
+    public int baseColour;
+    public int alphaOverride;
+    public boolean useNormals;
+    public boolean computeLighting;
+    public boolean useColour;
+    public LightMatrix lightMatrix = new LightMatrix();
 
     // vertex outputs
-    public static Vertex5 vert = new Vertex5();
-    public static boolean hasNormal;
-    public static Vector3 normal = new Vector3();
-    public static boolean hasColour;
-    public static int colour;
-    public static boolean hasBrightness;
-    public static int brightness;
+    public Vertex5 vert = new Vertex5();
+    public boolean hasNormal;
+    public Vector3 normal = new Vector3();
+    public boolean hasColour;
+    public int colour;
+    public boolean hasBrightness;
+    public int brightness;
 
     // attrute storage
-    public static int side;
-    public static LC lc = new LC();
+    public int side;
+    public LC lc = new LC();
 
-    public static void reset() {
+    public void reset() {
         model = null;
-        pipeline.reset();
+        pipelineLocal.reset();
         useNormals = hasNormal = hasBrightness = hasColour = false;
         useColour = computeLighting = true;
         baseColour = alphaOverride = -1;
     }
 
-    public static void setPipeline(IVertexOperation... ops) {
-        pipeline.setPipeline(ops);
+    public void setPipeline(IVertexOperation... ops) {
+        pipelineLocal.setPipeline(ops);
     }
 
-    public static void setPipeline(IVertexSource model, int start, int end, IVertexOperation... ops) {
-        pipeline.reset();
+    public void setPipeline(IVertexSource model, int start, int end, IVertexOperation... ops) {
+        pipelineLocal.reset();
         setModel(model, start, end);
-        pipeline.setPipeline(ops);
+        pipelineLocal.setPipeline(ops);
     }
 
-    public static void bindModel(IVertexSource model) {
-        if (CCRenderState.model != model) {
-            CCRenderState.model = model;
-            pipeline.rebuild();
+    public void bindModel(IVertexSource model) {
+        if (this.model != model) {
+            this.model = model;
+            pipelineLocal.rebuild();
         }
     }
 
-    public static void setModel(IVertexSource source) {
+    public void setModel(IVertexSource source) {
         setModel(source, 0, source.getVertices().length);
     }
 
-    public static void setModel(IVertexSource source, int start, int end) {
+    public void setModel(IVertexSource source, int start, int end) {
         bindModel(source);
         setVertexRange(start, end);
     }
 
-    public static void setVertexRange(int start, int end) {
+    public void setVertexRange(int start, int end) {
         firstVertexIndex = start;
         lastVertexIndex = end;
     }
 
-    public static void render(IVertexOperation... ops) {
+    public void render(IVertexOperation... ops) {
         setPipeline(ops);
         render();
     }
 
-    public static void render() {
+    public void render() {
         Vertex5[] verts = model.getVertices();
         for (vertexIndex = firstVertexIndex; vertexIndex < lastVertexIndex; vertexIndex++) {
-            model.prepareVertex();
+            model.prepareVertex(this);
             vert.set(verts[vertexIndex]);
             runPipeline();
             writeVert();
         }
     }
 
-    public static void runPipeline() {
-        pipeline.operate();
+    public void runPipeline() {
+        pipelineLocal.operate();
     }
 
-    public static void writeVert() {
+    public void writeVert() {
         if (hasNormal) Tessellator.instance.setNormal((float) normal.x, (float) normal.y, (float) normal.z);
         if (hasColour) Tessellator.instance.setColorRGBA(
                 colour >>> 24,
@@ -362,42 +378,42 @@ public class CCRenderState {
         Tessellator.instance.addVertexWithUV(vert.vec.x, vert.vec.y, vert.vec.z, vert.uv.u, vert.uv.v);
     }
 
-    public static void setNormal(double x, double y, double z) {
+    public void setNormal(double x, double y, double z) {
         hasNormal = true;
         normal.set(x, y, z);
     }
 
-    public static void setNormal(Vector3 n) {
+    public void setNormal(Vector3 n) {
         hasNormal = true;
         normal.set(n);
     }
 
-    public static void setColour(int c) {
+    public void setColour(int c) {
         hasColour = true;
         colour = c;
     }
 
-    public static void setBrightness(int b) {
+    public void setBrightness(int b) {
         hasBrightness = true;
         brightness = b;
     }
 
-    public static void setBrightness(IBlockAccess world, int x, int y, int z) {
+    public void setBrightness(IBlockAccess world, int x, int y, int z) {
         setBrightness(world.getBlock(x, y, z).getMixedBrightnessForBlock(world, x, y, z));
     }
 
-    public static void pullLightmap() {
+    public void pullLightmap() {
         setBrightness((int) OpenGlHelper.lastBrightnessY << 16 | (int) OpenGlHelper.lastBrightnessX);
     }
 
-    public static void pushLightmap() {
+    public void pushLightmap() {
         OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, brightness & 0xFFFF, brightness >>> 16);
     }
 
     /**
      * Compact helper for setting dynamic rendering context. Uses normals and doesn't compute lighting
      */
-    public static void setDynamic() {
+    public void setDynamic() {
         useNormals = true;
         computeLighting = false;
     }
@@ -410,11 +426,11 @@ public class CCRenderState {
         Minecraft.getMinecraft().renderEngine.bindTexture(texture);
     }
 
-    public static void startDrawing() {
+    public void startDrawing() {
         startDrawing(7);
     }
 
-    public static void startDrawing(int mode) {
+    public void startDrawing(int mode) {
         Tessellator.instance.startDrawing(mode);
         if (hasColour) Tessellator.instance.setColorRGBA(
                 colour >>> 24,
@@ -424,7 +440,7 @@ public class CCRenderState {
         if (hasBrightness) Tessellator.instance.setBrightness(brightness);
     }
 
-    public static void draw() {
+    public void draw() {
         Tessellator.instance.draw();
     }
 }

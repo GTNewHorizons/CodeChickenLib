@@ -17,17 +17,17 @@ public class PlanarLightModel implements CCRenderState.IVertexOperation {
     }
 
     @Override
-    public boolean load() {
-        if (!CCRenderState.computeLighting) return false;
+    public boolean load(CCRenderState state) {
+        if (!state.computeLighting) return false;
 
-        CCRenderState.pipeline.addDependency(CCRenderState.sideAttrib);
-        CCRenderState.pipeline.addDependency(CCRenderState.colourAttrib);
+        state.pipelineLocal.addDependency(CCRenderState.sideAttrib);
+        state.pipelineLocal.addDependency(CCRenderState.colourAttrib);
         return true;
     }
 
     @Override
-    public void operate() {
-        CCRenderState.setColour(ColourRGBA.multiply(CCRenderState.colour, colours[CCRenderState.side]));
+    public void operate(CCRenderState state) {
+        state.setColour(ColourRGBA.multiply(state.colour, colours[state.side]));
     }
 
     @Override

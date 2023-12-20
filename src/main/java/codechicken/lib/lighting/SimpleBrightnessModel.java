@@ -18,8 +18,8 @@ public class SimpleBrightnessModel implements CCRenderState.IVertexOperation {
     public BlockCoord pos = new BlockCoord();
 
     private int sampled = 0;
-    private int[] samples = new int[6];
-    private BlockCoord c = new BlockCoord();
+    private final int[] samples = new int[6];
+    private final BlockCoord c = new BlockCoord();
 
     public void locate(IBlockAccess a, int x, int y, int z) {
         access = a;
@@ -39,14 +39,14 @@ public class SimpleBrightnessModel implements CCRenderState.IVertexOperation {
     }
 
     @Override
-    public boolean load() {
-        CCRenderState.pipeline.addDependency(CCRenderState.sideAttrib);
+    public boolean load(CCRenderState state) {
+        state.pipelineLocal.addDependency(CCRenderState.sideAttrib);
         return true;
     }
 
     @Override
-    public void operate() {
-        CCRenderState.setBrightness(sample(CCRenderState.side));
+    public void operate(CCRenderState state) {
+        state.setBrightness(sample(state.side));
     }
 
     @Override

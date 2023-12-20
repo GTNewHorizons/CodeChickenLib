@@ -36,8 +36,8 @@ public class ObfMapping {
 
     public static class ObfRemapper extends Remapper {
 
-        private HashMap<String, String> fields = new HashMap<String, String>();
-        private HashMap<String, String> funcs = new HashMap<String, String>();
+        private final HashMap<String, String> fields = new HashMap<>();
+        private final HashMap<String, String> funcs = new HashMap<>();
 
         public ObfRemapper() {
             try {
@@ -174,8 +174,8 @@ public class ObfMapping {
             return new File[] { srgs, methods, fields };
         }
 
-        private HashMap<String, String> fields = new HashMap<String, String>();
-        private HashMap<String, String> funcs = new HashMap<String, String>();
+        private final HashMap<String, String> fields = new HashMap<>();
+        private final HashMap<String, String> funcs = new HashMap<>();
 
         public MCPRemapper() {
             File[] mappings = getConfFiles();
