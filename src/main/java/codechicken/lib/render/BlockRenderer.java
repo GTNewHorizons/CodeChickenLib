@@ -33,6 +33,7 @@ public class BlockRenderer {
             state.side = side;
         }
 
+
         public BlockFace computeLightCoords() {
             if (!lcComputed) {
                 for (int i = 0; i < 4; i++) lightCoords[i].compute(verts[i].vec, side);
@@ -157,6 +158,9 @@ public class BlockRenderer {
         state.setModel(fullBlock);
         renderFaces(state, sideMask);
     }
+    public static void renderFullBlock(int sideMask) {
+        renderFullBlock(CCRenderState.instance(), sideMask);
+    }
 
     /**
      * Renders faces of a block-like model based on a sideMask. Eg for side 2, verts 8-11 will be rendered
@@ -170,6 +174,9 @@ public class BlockRenderer {
             state.setVertexRange(s * 4, (s + 1) * 4);
             state.render();
         }
+    }
+    public static void renderFaces(int sideMask) {
+        renderFaces(CCRenderState.instance(), sideMask);
     }
 
     private static final BlockFace face = new BlockFace();
@@ -188,5 +195,8 @@ public class BlockRenderer {
             face.loadCuboidFace(bounds, s);
             state.render();
         }
+    }
+    public static void renderCuboid(Cuboid6 bounds, int sideMask) {
+        renderCuboid(CCRenderState.instance(), bounds, sideMask);
     }
 }

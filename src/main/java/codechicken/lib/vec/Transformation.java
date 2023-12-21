@@ -39,7 +39,7 @@ public abstract class Transformation extends ITransformation<Vector3, Transforma
 
     @Override
     public boolean load(CCRenderState state) {
-        state.pipelineLocal.addRequirement(CCRenderState.normalAttrib.operationID());
+        state.pipeline.addRequirement(CCRenderState.normalAttrib.operationID());
         return !isRedundant();
     }
 

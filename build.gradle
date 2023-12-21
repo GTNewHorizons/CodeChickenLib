@@ -1608,9 +1608,4 @@ if (file('addon.late.local.gradle.kts').exists()) {
 } else if (file('addon.late.local.gradle').exists()) {
     apply from: 'addon.late.local.gradle'
 }
-minecraft.extraRunJvmArguments.addAll([
-         "-Dlegacy.debugClassLoading=true"
-        , "-Dlegacy.debugClassLoadingFiner=true"
-        , "-Dlegacy.debugClassLoadingSave=true"
 
-])

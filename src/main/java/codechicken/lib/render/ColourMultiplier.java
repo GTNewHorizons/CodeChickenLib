@@ -4,7 +4,6 @@ import codechicken.lib.colour.ColourRGBA;
 
 public class ColourMultiplier implements CCRenderState.IVertexOperation {
 
-    // private static ColourMultiplier instance = new ColourMultiplier(-1);
     private static final ThreadLocal<ColourMultiplier> instances = ThreadLocal
             .withInitial(() -> new ColourMultiplier(-1));
 
@@ -28,7 +27,7 @@ public class ColourMultiplier implements CCRenderState.IVertexOperation {
             return false;
         }
 
-        state.pipelineLocal.addDependency(state.colourAttrib);
+        state.pipeline.addDependency(state.colourAttrib);
         return true;
     }
 

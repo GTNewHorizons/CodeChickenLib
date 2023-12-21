@@ -195,6 +195,9 @@ public class RenderUtils {
                 tex,
                 res);
     }
+    public static void renderFluidCuboid(Cuboid6 bound, IIcon tex, double res) {
+        renderFluidCuboid(CCRenderState.instance(), bound, tex, res);
+    }
 
     public static void renderBlockOverlaySide(int x, int y, int z, int side, double tx1, double tx2, double ty1,
             double ty2) {
@@ -260,6 +263,10 @@ public class RenderUtils {
         return TextureUtils.safeIcon(fluid.getIcon(stack));
     }
 
+    public static IIcon prepareFluidRender(FluidStack stack, int alpha) {
+        return prepareFluidRender(CCRenderState.instance(), stack, alpha);
+    }
+
     /**
      * Re-enables lighting and disables blending.
      */
@@ -297,6 +304,9 @@ public class RenderUtils {
         state.draw();
         postFluidRender();
     }
+    public static void renderFluidCuboid(FluidStack stack, Cuboid6 bound, double density, double res) {
+        renderFluidCuboid(CCRenderState.instance(), stack, bound, density, res);
+    }
 
     public static void renderFluidGauge(CCRenderState state, FluidStack stack, Rectangle4i rect, double density,
             double res) {
@@ -320,6 +330,9 @@ public class RenderUtils {
                 res);
         state.draw();
         postFluidRender();
+    }
+    public static void renderFluidGauge(FluidStack stack, Rectangle4i rect, double density, double res) {
+        renderFluidGauge(CCRenderState.instance(), stack, rect, density, res);
     }
 
     /**

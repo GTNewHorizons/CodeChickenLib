@@ -40,7 +40,7 @@ public class SimpleBrightnessModel implements CCRenderState.IVertexOperation {
 
     @Override
     public boolean load(CCRenderState state) {
-        state.pipelineLocal.addDependency(CCRenderState.sideAttrib);
+        state.pipeline.addDependency(CCRenderState.sideAttrib);
         return true;
     }
 
