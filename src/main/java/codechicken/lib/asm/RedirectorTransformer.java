@@ -26,7 +26,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class RedirectorTransformer implements IClassTransformer {
-    private static final boolean DUMP_CLASSES = Boolean.parseBoolean(System.getProperty("ccl.dumpClass", "true"));
+    private static final boolean DUMP_CLASSES = Boolean.parseBoolean(System.getProperty("ccl.dumpClass", "false"));
     private static final String RenderStateClass = "codechicken/lib/render/CCRenderState";
     private static final Set<String> redirectedFields = new HashSet<>();
     private static final Set<String> redirectedSimpleMethods = new HashSet<>();
@@ -120,8 +120,10 @@ public class RedirectorTransformer implements IClassTransformer {
             ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_MAXS);
             cn.accept(cw);
             final byte[] bytes = cw.toByteArray();
-            saveTransformedClass(bytes, transformedName);
-            saveTransformedClass(basicClass, transformedName + "_original");
+            if(DUMP_CLASSES) {
+                saveTransformedClass(bytes, transformedName);
+                saveTransformedClass(basicClass, transformedName + "_original");
+            }
             return bytes;
         }
         return basicClass;
