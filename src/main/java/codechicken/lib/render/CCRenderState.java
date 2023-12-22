@@ -57,10 +57,15 @@ public class CCRenderState {
          * Return false if this operation is redundant in the pipeline with the given model
          */
         default boolean load() {
+            // Existing code will will override this method so it shouldn't infinite loop
+            // Default it only for new state aware code
             return load(CCRenderState.instance());
         }
 
-        boolean load(CCRenderState state);
+        default boolean load(CCRenderState state) {
+            // New code will override this and not inplement load() so we shouldn't infinite loop
+            return load();
+        }
 
         /**
          * Perform the operation on the current render state
@@ -69,7 +74,9 @@ public class CCRenderState {
             operate(CCRenderState.instance());
         }
 
-        void operate(CCRenderState state);
+        default void operate(CCRenderState state) {
+            operate();
+        }
 
         /**
          * Get the unique id representing this type of operation. Duplicate operation IDs within the pipeline may have
@@ -79,7 +86,7 @@ public class CCRenderState {
         int operationID();
     }
 
-    private static ArrayList<VertexAttribute<?>> vertexAttributes = new ArrayList<VertexAttribute<?>>();
+    private static ArrayList<VertexAttribute<?>> vertexAttributes = new ArrayList<>();
 
     private static int registerVertexAttribute(VertexAttribute<?> attr) {
         vertexAttributes.add(attr);
