@@ -85,6 +85,11 @@ public class RedirectorTransformer implements IClassTransformer {
     public byte[] transform(String name, String transformedName, byte[] basicClass) {
         if (basicClass == null) return null;
 
+        if (!cstPoolParser.find(basicClass)) {
+            return basicClass;
+        }
+
+
         final ClassReader cr = new ClassReader(basicClass);
         final ClassNode cn = new ClassNode();
         cr.accept(cn, 0);
