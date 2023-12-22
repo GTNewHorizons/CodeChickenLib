@@ -31,6 +31,8 @@ public class RedirectorTransformer implements IClassTransformer {
     private static final Set<String> redirectedFields = new HashSet<>();
     private static final Set<String> redirectedSimpleMethods = new HashSet<>();
     private static final Set<String> redirectedMethods = new HashSet<>();
+    private static final ClassConstantPoolParser cstPoolParser;
+
 
     static {
         Collections.addAll(redirectedFields,
@@ -75,6 +77,8 @@ public class RedirectorTransformer implements IClassTransformer {
                 "setColour",
                 "setBrightness",
                 "startDrawing");
+
+        cstPoolParser = new ClassConstantPoolParser(RenderStateClass);
     }
 
     @Override
