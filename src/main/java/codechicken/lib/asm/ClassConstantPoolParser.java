@@ -1,4 +1,6 @@
-package codechicken.lib.asm; /***
+package codechicken.lib.asm;
+
+/***
  * This Class is derived from the ASM ClassReader
  * <p>
  * ASM: a very small and fast Java bytecode manipulation framework Copyright (c) 2000-2011 INRIA, France Telecom All
@@ -20,13 +22,13 @@ package codechicken.lib.asm; /***
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import org.objectweb.asm.Opcodes;
-
 import java.nio.charset.StandardCharsets;
 
+import org.objectweb.asm.Opcodes;
+
 /**
- * Using this class to search for a (single) String reference is > 40 times faster than parsing a class with a ClassReader +
- * ClassNode while using way less RAM
+ * Using this class to search for a (single) String reference is > 40 times faster than parsing a class with a
+ * ClassReader + ClassNode while using way less RAM
  */
 public class ClassConstantPoolParser {
 
@@ -52,8 +54,8 @@ public class ClassConstantPoolParser {
     }
 
     /**
-     * Returns true if the constant pool of the class represented by this byte array contains one of the Strings we are looking
-     * for
+     * Returns true if the constant pool of the class represented by this byte array contains one of the Strings we are
+     * looking for
      */
     public boolean find(byte[] basicClass) {
         if (basicClass == null || basicClass.length == 0) {
@@ -77,8 +79,7 @@ public class ClassConstantPoolParser {
                 case UTF8 -> {
                     final int strLen = readUnsignedShort(index + 1, basicClass);
                     size = 3 + strLen;
-                    label:
-                    for (byte[] bytes : BYTES_TO_SEARCH) {
+                    label: for (byte[] bytes : BYTES_TO_SEARCH) {
                         if (strLen == bytes.length) {
                             for (int j = index + 3; j < index + 3 + strLen; j++) {
                                 if (basicClass[j] != bytes[j - (index + 3)]) {

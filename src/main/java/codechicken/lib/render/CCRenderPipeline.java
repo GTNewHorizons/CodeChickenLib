@@ -17,12 +17,20 @@ public class CCRenderPipeline {
         builder = new PipelineBuilder(renderState);
     }
 
+    public CCRenderPipeline() {
+        this(CCRenderState.instance());
+    }
+
     public class PipelineBuilder {
 
         private final CCRenderState renderState;
 
         public PipelineBuilder(CCRenderState renderState) {
             this.renderState = renderState;
+        }
+
+        public PipelineBuilder() {
+            this(CCRenderState.instance());
         }
 
         public PipelineBuilder add(IVertexOperation op) {

@@ -33,7 +33,6 @@ public class BlockRenderer {
             state.side = side;
         }
 
-
         public BlockFace computeLightCoords() {
             if (!lcComputed) {
                 for (int i = 0; i < 4; i++) lightCoords[i].compute(verts[i].vec, side);
@@ -158,6 +157,7 @@ public class BlockRenderer {
         state.setModel(fullBlock);
         renderFaces(state, sideMask);
     }
+
     public static void renderFullBlock(int sideMask) {
         renderFullBlock(CCRenderState.instance(), sideMask);
     }
@@ -175,6 +175,7 @@ public class BlockRenderer {
             state.render();
         }
     }
+
     public static void renderFaces(int sideMask) {
         renderFaces(CCRenderState.instance(), sideMask);
     }
@@ -196,6 +197,7 @@ public class BlockRenderer {
             state.render();
         }
     }
+
     public static void renderCuboid(Cuboid6 bounds, int sideMask) {
         renderCuboid(CCRenderState.instance(), bounds, sideMask);
     }

@@ -74,4 +74,8 @@ public class Canvas9Seg {
 
         state.draw();
     }
+
+    public void draw(int x, int y, int w, int h) {
+        draw(CCRenderState.instance(), x, y, w, h);
+    }
 }

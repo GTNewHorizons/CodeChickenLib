@@ -195,6 +195,7 @@ public class RenderUtils {
                 tex,
                 res);
     }
+
     public static void renderFluidCuboid(Cuboid6 bound, IIcon tex, double res) {
         renderFluidCuboid(CCRenderState.instance(), bound, tex, res);
     }
@@ -304,6 +305,7 @@ public class RenderUtils {
         state.draw();
         postFluidRender();
     }
+
     public static void renderFluidCuboid(FluidStack stack, Cuboid6 bound, double density, double res) {
         renderFluidCuboid(CCRenderState.instance(), stack, bound, density, res);
     }
@@ -331,6 +333,7 @@ public class RenderUtils {
         state.draw();
         postFluidRender();
     }
+
     public static void renderFluidGauge(FluidStack stack, Rectangle4i rect, double density, double res) {
         renderFluidGauge(CCRenderState.instance(), stack, rect, density, res);
     }

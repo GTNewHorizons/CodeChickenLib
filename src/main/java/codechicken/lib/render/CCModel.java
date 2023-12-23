@@ -91,7 +91,6 @@ public class CCModel implements CCRenderState.IVertexSource, Copyable<CCModel> {
     @Override
     public void prepareVertex(CCRenderState state) {}
 
-
     public <T> T getOrAllocate(CCRenderState.VertexAttribute<T> attrib) {
         T array = getAttributes(attrib);
         if (array == null) {
@@ -431,6 +430,7 @@ public class CCModel implements CCRenderState.IVertexSource, Copyable<CCModel> {
     public void render(CCRenderState state, double x, double y, double z, double u, double v) {
         render(state, new Vector3(x, y, z).translation(), new UVTranslation(u, v));
     }
+
     public void render(double x, double y, double z, double u, double v) {
         render(CCRenderState.instance(), new Vector3(x, y, z).translation(), new UVTranslation(u, v));
     }
@@ -438,21 +438,27 @@ public class CCModel implements CCRenderState.IVertexSource, Copyable<CCModel> {
     public void render(CCRenderState state, double x, double y, double z, UVTransformation u) {
         render(state, new Vector3(x, y, z).translation(), u);
     }
+
     public void render(double x, double y, double z, UVTransformation u) {
         render(CCRenderState.instance(), new Vector3(x, y, z).translation(), u);
     }
+
     public void render(CCRenderState state, Transformation t, double u, double v) {
         render(state, t, new UVTranslation(u, v));
     }
+
     public void render(Transformation t, double u, double v) {
         render(CCRenderState.instance(), t, new UVTranslation(u, v));
     }
+
     public void render(CCRenderState state, CCRenderState.IVertexOperation... ops) {
         render(state, 0, verts.length, ops);
     }
+
     public void render(CCRenderState.IVertexOperation... ops) {
         render(CCRenderState.instance(), 0, verts.length, ops);
     }
+
     /**
      * Renders vertices start through start+length-1 of the model
      * 
@@ -464,9 +470,11 @@ public class CCModel implements CCRenderState.IVertexSource, Copyable<CCModel> {
         state.setPipeline(this, start, end, ops);
         state.render();
     }
+
     public void render(int start, int end, CCRenderState.IVertexOperation... ops) {
         render(CCRenderState.instance(), start, end, ops);
     }
+
     public static CCModel quadModel(int numVerts) {
         return newModel(7, numVerts);
     }

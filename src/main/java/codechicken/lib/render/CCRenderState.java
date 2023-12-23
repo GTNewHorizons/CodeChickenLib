@@ -17,14 +17,15 @@ import codechicken.lib.vec.Transformation;
 import codechicken.lib.vec.Vector3;
 
 /**
- * The core of the CodeChickenLib render system.
- * Where possible assign a local var of CCRenderState to avoid millions of calls to instance();
- * Uses a ThreadLocal system to assign each thread their own CCRenderState so we can use it in Multithreaded chunk batching.
+ * The core of the CodeChickenLib render system. Where possible assign a local var of CCRenderState to avoid millions of
+ * calls to instance(); Uses a ThreadLocal system to assign each thread their own CCRenderState so we can use it in
+ * Multithreaded chunk batching.
  * <p>
  * Backported from CCL - 1.16.x
  */
 
 public class CCRenderState {
+
     public final CCRenderPipeline pipeline;
 
     private static final ThreadLocal<CCRenderState> instances = ThreadLocal.withInitial(CCRenderState::new);
@@ -161,7 +162,6 @@ public class CCRenderState {
         /**
          * Callback to set CCRenderState for a vertex before the pipeline runs
          */
-        // public void prepareVertex();
         void prepareVertex(CCRenderState state);
 
         default void prepareVertex() {
@@ -187,7 +187,8 @@ public class CCRenderState {
                 state.pipeline.addDependency(sideAttrib);
                 return true;
             }
-            throw new IllegalStateException("Normals requested but neither normal or side attrutes are provided by the model");
+            throw new IllegalStateException(
+                    "Normals requested but neither normal or side attrutes are provided by the model");
         }
 
         @Override
@@ -303,76 +304,31 @@ public class CCRenderState {
     public IVertexSource model;
 
     public int firstVertexIndex;
-    public static void setFirstVertexIndexStatic(int i) {
-        instance().firstVertexIndex = i;
-    }
     public int lastVertexIndex;
-    public static void setLastVertexIndexStatic(int i) {
-        instance().lastVertexIndex = i;
-    }
     public int vertexIndex;
-    public static void setVertexIndexStatic(int i) {
-        instance().vertexIndex = i;
-    }
 
     // context
     public int baseColour;
-    public static void setBaseColourStatic(int c) {
-        instance().baseColour = c;
-    }
     public int alphaOverride;
-    public static void setAlphaOverrideStatic(int a) {
-        instance().alphaOverride = a;
-    }
     public boolean useNormals;
-    public static void setUseNormalsStatic(boolean b) {
-        instance().useNormals = b;
-    }
     public boolean computeLighting;
-    public static void setComputeLightingStatic(boolean b) {
-        instance().computeLighting = b;
-    }
     public boolean useColour;
-    public static void setUseColourStatic(boolean b) {
-        instance().useColour = b;
-    }
     public LightMatrix lightMatrix = new LightMatrix();
-    public static void setLightMatrixStatic(LightMatrix m) {
-        instance().lightMatrix = m;
-    }
 
     // vertex outputs
     public Vertex5 vert = new Vertex5();
-    public static void setVertStatic(Vertex5 v) {
-        instance().vert = v;
-    }
     public boolean hasNormal;
-    public static void setHasNormalStatic(boolean b) {
-        instance().hasNormal = b;
-    }
     public Vector3 normal = new Vector3();
 
     public boolean hasColour;
-    public static void setHasColourStatic(boolean b) {
-        instance().hasColour = b;
-    }
     public int colour;
 
     public boolean hasBrightness;
-    public static void setHasBrightnessStatic(boolean b) {
-        instance().hasBrightness = b;
-    }
     public int brightness;
 
     // attrute storage
     public int side;
-    public static void setSideStatic(int s) {
-        instance().side = s;
-    }
     public LC lc = new LC();
-    public static void setLcStatic(LC l) {
-        instance().lc = l;
-    }
 
     public void reset() {
         model = null;
@@ -386,6 +342,7 @@ public class CCRenderState {
         pipeline.setPipeline(ops);
     }
 
+    @Deprecated
     public static void setPipelineStatic(IVertexOperation... ops) {
         instance().setPipeline(ops);
     }
@@ -396,6 +353,7 @@ public class CCRenderState {
         pipeline.setPipeline(ops);
     }
 
+    @Deprecated
     public static void setPipelineStatic(IVertexSource model, int start, int end, IVertexOperation... ops) {
         instance().setPipeline(model, start, end, ops);
     }
@@ -406,6 +364,8 @@ public class CCRenderState {
             pipeline.rebuild();
         }
     }
+
+    @Deprecated
     public static void bindModelStatic(IVertexSource model) {
         instance().bindModel(model);
     }
@@ -414,6 +374,7 @@ public class CCRenderState {
         setModel(source, 0, source.getVertices().length);
     }
 
+    @Deprecated
     public static void setModelStatic(IVertexSource source) {
         instance().setModel(source);
     }
@@ -423,6 +384,7 @@ public class CCRenderState {
         setVertexRange(start, end);
     }
 
+    @Deprecated
     public static void setModelStatic(IVertexSource source, int start, int end) {
         instance().setModel(source, start, end);
     }
@@ -432,13 +394,17 @@ public class CCRenderState {
         lastVertexIndex = end;
     }
 
+    @Deprecated
     public static void setVertexRangeStatic(int start, int end) {
         instance().setVertexRange(start, end);
     }
+
     public void render(IVertexOperation... ops) {
         setPipeline(ops);
         render();
     }
+
+    @Deprecated
     public static void renderStatic(IVertexOperation... ops) {
         instance().render(ops);
     }
@@ -452,6 +418,8 @@ public class CCRenderState {
             writeVert();
         }
     }
+
+    @Deprecated
     public static void renderStatic() {
         instance().render();
     }
@@ -460,6 +428,7 @@ public class CCRenderState {
         pipeline.operate();
     }
 
+    @Deprecated
     public static void runPipelineStatic() {
         instance().runPipeline();
     }
@@ -474,6 +443,8 @@ public class CCRenderState {
         if (hasBrightness) Tessellator.instance.setBrightness(brightness);
         Tessellator.instance.addVertexWithUV(vert.vec.x, vert.vec.y, vert.vec.z, vert.uv.u, vert.uv.v);
     }
+
+    @Deprecated
     public static void writeVertStatic() {
         instance().writeVert();
     }
@@ -482,6 +453,8 @@ public class CCRenderState {
         hasNormal = true;
         normal.set(x, y, z);
     }
+
+    @Deprecated
     public static void setNormalStatic(double x, double y, double z) {
         instance().setNormal(x, y, z);
     }
@@ -491,6 +464,7 @@ public class CCRenderState {
         normal.set(n);
     }
 
+    @Deprecated
     public static void setNormalStatic(Vector3 n) {
         instance().setNormal(n);
     }
@@ -499,6 +473,8 @@ public class CCRenderState {
         hasColour = true;
         colour = c;
     }
+
+    @Deprecated
     public static void setColourStatic(int c) {
         instance().setColour(c);
     }
@@ -507,6 +483,8 @@ public class CCRenderState {
         hasBrightness = true;
         brightness = b;
     }
+
+    @Deprecated
     public static void setBrightnessStatic(int b) {
         instance().setBrightness(b);
     }
@@ -514,6 +492,8 @@ public class CCRenderState {
     public void setBrightness(IBlockAccess world, int x, int y, int z) {
         setBrightness(world.getBlock(x, y, z).getMixedBrightnessForBlock(world, x, y, z));
     }
+
+    @Deprecated
     public static void setBrightnessStatic(IBlockAccess world, int x, int y, int z) {
         instance().setBrightness(world, x, y, z);
     }
@@ -545,6 +525,8 @@ public class CCRenderState {
     public void startDrawing() {
         startDrawing(7);
     }
+
+    @Deprecated
     public static void startDrawingStatic() {
         instance().startDrawing();
     }
@@ -558,6 +540,8 @@ public class CCRenderState {
                 alphaOverride >= 0 ? alphaOverride : colour & 0xFF);
         if (hasBrightness) Tessellator.instance.setBrightness(brightness);
     }
+
+    @Deprecated
     public static void startDrawingStatic(int mode) {
         instance().startDrawing(mode);
     }

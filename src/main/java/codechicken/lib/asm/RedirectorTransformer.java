@@ -1,21 +1,5 @@
 package codechicken.lib.asm;
 
-import net.minecraft.launchwrapper.IClassTransformer;
-import net.minecraft.launchwrapper.Launch;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.ClassWriter;
-import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.tree.AbstractInsnNode;
-import org.objectweb.asm.tree.ClassNode;
-import org.objectweb.asm.tree.FieldInsnNode;
-import org.objectweb.asm.tree.MethodInsnNode;
-import org.objectweb.asm.tree.MethodNode;
-import org.objectweb.asm.util.ASMifier;
-import org.objectweb.asm.util.Textifier;
-import org.objectweb.asm.util.TraceClassVisitor;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -25,7 +9,26 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import net.minecraft.launchwrapper.IClassTransformer;
+import net.minecraft.launchwrapper.Launch;
+
+import org.apache.commons.io.FileUtils;
+import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.ClassWriter;
+import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.tree.AbstractInsnNode;
+import org.objectweb.asm.tree.ClassNode;
+import org.objectweb.asm.tree.FieldInsnNode;
+import org.objectweb.asm.tree.InsnList;
+import org.objectweb.asm.tree.InsnNode;
+import org.objectweb.asm.tree.MethodInsnNode;
+import org.objectweb.asm.tree.MethodNode;
+import org.objectweb.asm.util.ASMifier;
+import org.objectweb.asm.util.Textifier;
+import org.objectweb.asm.util.TraceClassVisitor;
+
 public class RedirectorTransformer implements IClassTransformer {
+
     private static final boolean DUMP_CLASSES = Boolean.parseBoolean(System.getProperty("ccl.dumpClass", "false"));
     private static final String RenderStateClass = "codechicken/lib/render/CCRenderState";
     private static final Set<String> redirectedFields = new HashSet<>();
@@ -33,37 +36,32 @@ public class RedirectorTransformer implements IClassTransformer {
     private static final Set<String> redirectedMethods = new HashSet<>();
     private static final ClassConstantPoolParser cstPoolParser;
 
-
     static {
-        Collections.addAll(redirectedFields,
-                     "pipeline"
-                    ,"model"
-                    ,"firstVertexIndex"
-                    ,"lastVertexIndex"
-                    ,"vertexIndex"
-                    ,"baseColour"
-                    ,"alphaOverride"
-                    ,"useNormals"
-                    ,"computeLighting"
-                    ,"useColour"
-                    ,"lightMatrix"
-                    ,"vert"
-                    ,"hasNormal"
-                    ,"normal"
-                    ,"hasColour"
-                    ,"colour"
-                    ,"hasBrightness"
-                    ,"brightness"
-                    ,"side"
-                    ,"lc"
+        Collections.addAll(
+                redirectedFields,
+                "pipeline",
+                "model",
+                "firstVertexIndex",
+                "lastVertexIndex",
+                "vertexIndex",
+                "baseColour",
+                "alphaOverride",
+                "useNormals",
+                "computeLighting",
+                "useColour",
+                "lightMatrix",
+                "vert",
+                "hasNormal",
+                "normal",
+                "hasColour",
+                "colour",
+                "hasBrightness",
+                "brightness",
+                "side",
+                "lc"
 
-                );
-        Collections.addAll(redirectedSimpleMethods,
-                "reset",
-                "pullLightmap",
-                "pushLightmap",
-                "setDynamic",
-                "draw");
+        );
+        Collections.addAll(redirectedSimpleMethods, "reset", "pullLightmap", "pushLightmap", "setDynamic", "draw");
         Collections.addAll(
                 redirectedMethods,
                 "setPipeline",
@@ -87,7 +85,6 @@ public class RedirectorTransformer implements IClassTransformer {
             return basicClass;
         }
 
-
         final ClassReader cr = new ClassReader(basicClass);
         final ClassNode cn = new ClassNode();
         cr.accept(cn, 0);
@@ -95,27 +92,45 @@ public class RedirectorTransformer implements IClassTransformer {
 
         for (MethodNode mn : cn.methods) {
             for (AbstractInsnNode node : mn.instructions.toArray()) {
-                if (node.getOpcode() == Opcodes.GETSTATIC && node instanceof FieldInsnNode fNode) {
-                    if(redirectedFields.contains(fNode.name) && fNode.owner.equals(RenderStateClass)) {
-                        mn.instructions.insertBefore(fNode, new MethodInsnNode(Opcodes.INVOKESTATIC, fNode.owner, "instance", "()Lcodechicken/lib/render/CCRenderState;"));
+                if (node instanceof FieldInsnNode fNode) {
+                    if (node.getOpcode() == Opcodes.GETSTATIC && redirectedFields.contains(fNode.name)
+                            && fNode.owner.equals(RenderStateClass)) {
+                        mn.instructions.insertBefore(
+                                fNode,
+                                new MethodInsnNode(
+                                        Opcodes.INVOKESTATIC,
+                                        fNode.owner,
+                                        "instance",
+                                        "()Lcodechicken/lib/render/CCRenderState;"));
                         fNode.setOpcode(Opcodes.GETFIELD);
                         changed = true;
-                    }
-                }
-                else if (node.getOpcode() == Opcodes.PUTSTATIC && node instanceof FieldInsnNode fNode) {
-                    if(redirectedFields.contains(fNode.name) && fNode.owner.equals(RenderStateClass)) {
-                        final String fName = "set" + StringUtils.capitalize(fNode.name) + "Static";
-                        final String fDesc = "(" + fNode.desc + ")V";
-                        mn.instructions.set(node, new MethodInsnNode(Opcodes.INVOKESTATIC, fNode.owner, fName, fDesc));
-                        changed = true;
-                    }
-                }
-                else if(node.getOpcode() == Opcodes.INVOKESTATIC && node instanceof MethodInsnNode mNode) {
-                    if(redirectedMethods.contains(mNode.name) && mNode.owner.equals(RenderStateClass)) {
+                    } else if (node.getOpcode() == Opcodes.PUTSTATIC
+                            && (redirectedFields.contains(fNode.name) && fNode.owner.equals(RenderStateClass))) {
+                                InsnList beforePut = new InsnList();
+                                beforePut.add(
+                                        new MethodInsnNode(
+                                                Opcodes.INVOKESTATIC,
+                                                fNode.owner,
+                                                "instance",
+                                                "()Lcodechicken/lib/render/CCRenderState;"));
+                                beforePut.add(new InsnNode(Opcodes.SWAP));
+                                mn.instructions.insertBefore(fNode, beforePut);
+                                fNode.setOpcode(Opcodes.PUTFIELD);
+                                changed = true;
+
+                            }
+                } else if (node.getOpcode() == Opcodes.INVOKESTATIC && node instanceof MethodInsnNode mNode) {
+                    if (redirectedMethods.contains(mNode.name) && mNode.owner.equals(RenderStateClass)) {
                         mNode.name = mNode.name + "Static";
                         changed = true;
-                    } else if(redirectedSimpleMethods.contains(mNode.name) && mNode.owner.equals(RenderStateClass)) {
-                        mn.instructions.insertBefore(mNode, new MethodInsnNode(Opcodes.INVOKESTATIC, mNode.owner, "instance", "()Lcodechicken/lib/render/CCRenderState;"));
+                    } else if (redirectedSimpleMethods.contains(mNode.name) && mNode.owner.equals(RenderStateClass)) {
+                        mn.instructions.insertBefore(
+                                mNode,
+                                new MethodInsnNode(
+                                        Opcodes.INVOKESTATIC,
+                                        mNode.owner,
+                                        "instance",
+                                        "()Lcodechicken/lib/render/CCRenderState;"));
                         mNode.setOpcode(Opcodes.INVOKEVIRTUAL);
                         changed = true;
                     }
@@ -127,7 +142,7 @@ public class RedirectorTransformer implements IClassTransformer {
             ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_MAXS);
             cn.accept(cw);
             final byte[] bytes = cw.toByteArray();
-            if(DUMP_CLASSES) {
+            if (DUMP_CLASSES) {
                 saveTransformedClass(bytes, transformedName);
                 saveTransformedClass(basicClass, transformedName + "_original");
             }
@@ -135,7 +150,9 @@ public class RedirectorTransformer implements IClassTransformer {
         }
         return basicClass;
     }
+
     private File outputDir = null;
+
     private void saveTransformedClass(final byte[] data, final String transformedName) {
         if (!DUMP_CLASSES) {
             return;
@@ -147,7 +164,7 @@ public class RedirectorTransformer implements IClassTransformer {
                 FileUtils.deleteDirectory(outputDir);
             } catch (IOException ignored) {}
             if (!outputDir.exists()) {
-                //noinspection ResultOfMethodCallIgnored
+                // noinspection ResultOfMethodCallIgnored
                 outputDir.mkdirs();
             }
         }
