@@ -132,12 +132,13 @@ public class RedirectorTransformer implements IClassTransformer {
                         mNode.setOpcode(Opcodes.INVOKEVIRTUAL);
                         mNode.name = mNode.name + "Instance";
                         changed = true;
-                    } else if (node.getOpcode() == Opcodes.INVOKEVIRTUAL && redirectedMethods.contains(mNode.name)
-                            && mNode.owner.equals(RenderStateClass)) {
-                                // Handle mods that updated to previously new API
-                                mNode.name = mNode.name + "Instance";
-                                changed = true;
-                            }
+                    } else if (node.getOpcode() == Opcodes.INVOKEVIRTUAL && mNode.owner.equals(RenderStateClass)
+                            && (redirectedSimpleMethods.contains(mNode.name)
+                                    || redirectedMethods.contains(mNode.name))) {
+                                        // Handle mods that updated to previously new API
+                                        mNode.name = mNode.name + "Instance";
+                                        changed = true;
+                                    }
                 }
             }
         }
